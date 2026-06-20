@@ -132,6 +132,12 @@ function Stats() {
           </div>
         </div>
 
+        <div className="mt-12">
+          <Heatmap />
+        </div>
+
+
+
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card label="All time" value={formatDuration(sumWork(sessions, 0))} />
           <Card label="Total sessions" value={countWork(sessions, 0).toString()} />
