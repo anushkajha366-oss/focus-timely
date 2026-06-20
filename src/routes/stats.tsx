@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/timely/Shell";
+import { Heatmap } from "@/components/timely/Heatmap";
 import {
   formatDuration,
   startOfDay,
