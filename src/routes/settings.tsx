@@ -1,35 +1,42 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/timely/Shell";
 import { useSettings, type Settings } from "@/lib/timely-store";
+import { Sparkle, Sun, Moon, Heart, Coffee, Book } from "@/components/timely/Decor";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Timely" },
-      { name: "description", content: "Tune your focus and break durations, notifications, and theme." },
+      { name: "description", content: "Customize your cozy study durations, sounds, and theme." },
       { property: "og:title", content: "Settings — Timely" },
-      { property: "og:description", content: "Tune your focus and break durations, notifications, and theme." },
+      { property: "og:description", content: "Customize your cozy study durations, sounds, and theme." },
     ],
   }),
   component: SettingsPage,
 });
 
-function Row({
-  label,
-  description,
-  children,
-}: {
-  label: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+function Group({ title, icon: Icon, children }: { title: string; icon: typeof Heart; children: React.ReactNode }) {
   return (
-    <div className="py-6 border-b border-border/60 flex items-start justify-between gap-8">
+    <div className="card-soft p-6 mb-5">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="grid place-items-center h-8 w-8 rounded-xl bg-secondary text-primary">
+          <Icon size={16} />
+        </span>
+        <h2 className="font-display text-2xl tracking-tight">{title}</h2>
+      </div>
+      <div className="divide-y divide-border/60">{children}</div>
+    </div>
+  );
+}
+
+function Row({
+  label, description, children,
+}: { label: string; description?: string; children: React.ReactNode }) {
+  return (
+    <div className="py-5 flex items-start justify-between gap-6">
       <div className="max-w-md">
-        <div className="text-sm text-foreground">{label}</div>
-        {description && (
-          <div className="text-xs text-muted-foreground mt-1">{description}</div>
-        )}
+        <div className="text-sm font-medium text-foreground">{label}</div>
+        {description && <div className="text-xs text-muted-foreground mt-1">{description}</div>}
       </div>
       <div className="flex-shrink-0">{children}</div>
     </div>
@@ -37,40 +44,26 @@ function Row({
 }
 
 function NumberInput({
-  value,
-  onChange,
-  min = 1,
-  max = 180,
-}: {
-  value: number;
-  onChange: (v: number) => void;
-  min?: number;
-  max?: number;
-}) {
+  value, onChange, min = 1, max = 180,
+}: { value: number; onChange: (v: number) => void; min?: number; max?: number }) {
   return (
-    <div className="flex items-center border border-border rounded-md">
+    <div className="flex items-center bg-secondary/50 rounded-full border border-border">
       <button
-        className="px-3 py-1.5 text-muted-foreground hover:text-foreground"
+        className="h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-card transition-colors"
         onClick={() => onChange(Math.max(min, value - 1))}
         aria-label="decrease"
-      >
-        −
-      </button>
+      >−</button>
       <input
         type="number"
-        value={value}
-        min={min}
-        max={max}
+        value={value} min={min} max={max}
         onChange={(e) => onChange(Math.min(max, Math.max(min, Number(e.target.value) || min)))}
-        className="w-14 text-center bg-transparent py-1.5 outline-none tabular text-sm"
+        className="w-12 text-center bg-transparent py-1.5 outline-none tabular text-sm font-medium"
       />
       <button
-        className="px-3 py-1.5 text-muted-foreground hover:text-foreground"
+        className="h-9 w-9 rounded-full text-muted-foreground hover:text-primary hover:bg-card transition-colors"
         onClick={() => onChange(Math.min(max, value + 1))}
         aria-label="increase"
-      >
-        +
-      </button>
+      >+</button>
     </div>
   );
 }
@@ -78,18 +71,17 @@ function NumberInput({
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
-      role="switch"
-      aria-checked={checked}
+      role="switch" aria-checked={checked}
       onClick={() => onChange(!checked)}
       className={
-        "relative h-6 w-11 rounded-full transition-colors " +
-        (checked ? "bg-foreground" : "bg-secondary border border-border")
+        "relative h-7 w-12 rounded-full transition-colors " +
+        (checked ? "bg-primary" : "bg-secondary border border-border")
       }
     >
       <span
         className={
-          "absolute top-0.5 h-5 w-5 rounded-full transition-transform " +
-          (checked ? "translate-x-[22px] bg-background" : "translate-x-0.5 bg-foreground")
+          "absolute top-0.5 h-6 w-6 rounded-full bg-card shadow-sm transition-transform " +
+          (checked ? "translate-x-[22px]" : "translate-x-0.5")
         }
       />
     </button>
@@ -99,7 +91,6 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 function SettingsPage() {
   const { settings, update, hydrated } = useSettings();
   if (!hydrated) return <Shell><div className="h-96" /></Shell>;
-
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => update({ [k]: v } as Partial<Settings>);
 
   const requestNotifications = async (enabled: boolean) => {
@@ -111,90 +102,87 @@ function SettingsPage() {
 
   return (
     <Shell>
-      <section className="mx-auto max-w-2xl px-6 py-12 md:py-16">
-        <header className="mb-8">
-          <h1 className="font-display text-5xl md:text-6xl">Settings</h1>
+      <section className="mx-auto max-w-2xl px-6 py-10 md:py-14">
+        <header className="mb-8 text-center md:text-left">
+          <p className="font-script text-2xl text-rose">make it yours ♡</p>
+          <h1 className="font-display text-5xl md:text-6xl tracking-tight mt-1">Settings</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Personalize Timely. Changes save automatically.
+            Tweak your durations and vibes. Everything saves automatically.
           </p>
         </header>
 
-        <div>
-          <h2 className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-10 mb-2">
-            Timer
-          </h2>
+        <Group title="Timer" icon={Book}>
           <Row label="Work duration" description="Length of one focus session, in minutes.">
             <NumberInput value={settings.workMinutes} onChange={(v) => set("workMinutes", v)} />
           </Row>
-          <Row label="Short break" description="Recovery time between focus sessions.">
+          <Row label="Short break" description="A little breather between sessions.">
             <NumberInput value={settings.breakMinutes} onChange={(v) => set("breakMinutes", v)} />
           </Row>
-          <Row label="Long break" description="Extended rest after a full cycle.">
+          <Row label="Long break" description="A longer cozy rest after a full cycle.">
             <NumberInput value={settings.longBreakMinutes} onChange={(v) => set("longBreakMinutes", v)} />
           </Row>
           <Row label="Sessions before long break">
             <NumberInput
-              value={settings.sessionsBeforeLongBreak}
-              min={2}
-              max={10}
+              value={settings.sessionsBeforeLongBreak} min={2} max={10}
               onChange={(v) => set("sessionsBeforeLongBreak", v)}
             />
           </Row>
+        </Group>
 
-          <h2 className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-10 mb-2">
-            Alerts
-          </h2>
-          <Row label="Notification sound" description="A soft chime when a session ends.">
+        <Group title="Alerts" icon={Sparkle}>
+          <Row label="Notification sound" description="A soft little chime when a session ends.">
             <Toggle checked={settings.soundEnabled} onChange={(v) => set("soundEnabled", v)} />
           </Row>
-          <Row label="Browser notifications" description="Get notified even in another tab.">
+          <Row label="Browser notifications" description="Get a sweet nudge even in another tab.">
             <Toggle
               checked={settings.notificationsEnabled}
               onChange={(v) => requestNotifications(v)}
             />
           </Row>
+        </Group>
 
-          <h2 className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-10 mb-2">
-            Appearance
-          </h2>
-          <Row label="Theme" description="Dark by default. Light for daytime sessions.">
-            <div className="flex border border-border rounded-md overflow-hidden">
-              {(["dark", "light"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => set("theme", t)}
-                  className={
-                    "px-4 py-1.5 text-sm capitalize " +
-                    (settings.theme === t
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground")
-                  }
-                >
-                  {t}
-                </button>
-              ))}
+        <Group title="Appearance" icon={Heart}>
+          <Row label="Theme" description="Blush light by day, dusty rose by night.">
+            <div className="flex p-1 bg-secondary/60 rounded-full border border-border gap-1">
+              {([
+                { v: "light", icon: Sun, label: "Light" },
+                { v: "dark",  icon: Moon, label: "Dark"  },
+              ] as const).map(({ v, icon: Icon, label }) => {
+                const active = settings.theme === v;
+                return (
+                  <button
+                    key={v}
+                    onClick={() => set("theme", v)}
+                    className={
+                      "inline-flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-full transition-all " +
+                      (active ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")
+                    }
+                  >
+                    <Icon size={14} /> {label}
+                  </button>
+                );
+              })}
             </div>
           </Row>
+        </Group>
 
-          <h2 className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-10 mb-2">
-            Data
-          </h2>
-          <Row label="Reset all data" description="Clear sessions and restore default settings.">
+        <Group title="Data" icon={Coffee}>
+          <Row label="Reset all data" description="Clear all sessions and restore defaults. This can't be undone.">
             <button
               onClick={() => {
-                if (confirm("Delete all sessions and reset settings?")) {
+                if (confirm("Clear all sessions and reset settings?")) {
                   localStorage.removeItem("timely.sessions");
                   localStorage.removeItem("timely.settings");
                   window.dispatchEvent(new Event("timely:sessions-updated"));
                   location.reload();
                 }
               }}
-              className="px-4 py-1.5 text-sm rounded-md border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors"
+              className="px-5 py-2 text-sm rounded-full bg-card border border-border text-muted-foreground hover:text-destructive hover:border-destructive/50 transition-colors"
             >
               Reset
             </button>
           </Row>
-        </div>
+        </Group>
       </section>
     </Shell>
   );
