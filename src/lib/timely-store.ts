@@ -17,7 +17,7 @@ export const defaultSettings: Settings = {
   sessionsBeforeLongBreak: 4,
   soundEnabled: true,
   notificationsEnabled: false,
-  theme: "dark",
+  theme: "light",
 };
 
 export type SessionLog = {
@@ -53,7 +53,7 @@ export function useSettings() {
   useEffect(() => {
     if (!hydrated) return;
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    document.documentElement.classList.toggle("light", settings.theme === "light");
+    document.documentElement.classList.toggle("dark", settings.theme === "dark");
   }, [settings, hydrated]);
 
   const update = useCallback((patch: Partial<Settings>) => {
