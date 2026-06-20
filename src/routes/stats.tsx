@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/timely/Shell";
+import { Heatmap } from "@/components/timely/Heatmap";
 import {
   formatDuration,
   startOfDay,
@@ -130,6 +131,12 @@ function Stats() {
             <span>Today</span>
           </div>
         </div>
+
+        <div className="mt-12">
+          <Heatmap />
+        </div>
+
+
 
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card label="All time" value={formatDuration(sumWork(sessions, 0))} />
