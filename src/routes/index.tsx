@@ -49,7 +49,7 @@ function Home() {
         <div className="text-center">
           <p className="font-script text-2xl text-rose">{greet()} ♡</p>
           <h1 className="font-display text-4xl md:text-5xl mt-1 tracking-tight">
-            Let&rsquo;s have a cozy study session
+            Let's have a cozy study session
           </h1>
         </div>
       </section>
@@ -63,9 +63,9 @@ function Home() {
           <div className="hidden md:flex justify-center">
             <div className="card-soft p-6 max-w-[240px] text-center">
               <Sparkle className="text-rose mx-auto" size={18} />
-              <p className="font-script text-2xl text-rose mt-1">today&rsquo;s vibe</p>
+              <p className="font-script text-2xl text-rose mt-1">today's vibe</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Pop in your earbuds, light a candle, and let&rsquo;s make this session count.
+                Pop in your earbuds, light a candle, and let's make this session count.
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@ function Home() {
               <p className="text-xs text-muted-foreground mt-2">
                 {pct >= 100
                   ? "Daily goal met — you legend! ♡"
-                  : `${pct}% toward today&rsquo;s cozy goal`}
+                  : `${pct}% toward today's cozy goal`}
               </p>
             </div>
           </div>
@@ -113,7 +113,7 @@ function Home() {
               {streak === 0
                 ? "Start your streak with one tiny session ♡"
                 : streak < 3
-                ? "You&rsquo;re building something lovely."
+                ? "You're building something lovely."
                 : "Look at you go, consistency queen!"}
             </p>
           </div>
@@ -129,7 +129,7 @@ function Home() {
             <p className="text-sm text-muted-foreground mt-2">
               {todaysSessions === 0
                 ? "An empty page is a fresh start ✦"
-                : "One session at a time — you&rsquo;re glowing."}
+                : "One session at a time — you're glowing."}
             </p>
           </div>
         </div>
