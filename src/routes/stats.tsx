@@ -1,15 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/timely/Shell";
 import { Heatmap } from "@/components/timely/Heatmap";
-import { Sparkle, Star, Heart, Flower, Book, Coffee } from "@/components/timely/Decor";
+import { Sparkle, Star, Heart, Flower, Book, Coffee, Calendar, Bow, SparkleCluster } from "@/components/timely/Decor";
 import {
   formatDuration,
   startOfDay,
   useSessions,
-  useSettings,
   type SessionLog,
 } from "@/lib/timely-store";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import mascot from "@/assets/mascot-bear.png";
+import studyDesk from "@/assets/study-desk.png";
 
 export const Route = createFileRoute("/stats")({
   head: () => ({
@@ -23,10 +24,22 @@ export const Route = createFileRoute("/stats")({
   component: Stats,
 });
 
+type Range = "daily" | "weekly" | "monthly" | "yearly";
+
+function rangeStart(r: Range): number {
+  const now = new Date();
+  const d = startOfDay(now);
+  if (r === "daily") return d.getTime();
+  if (r === "weekly") { d.setDate(d.getDate() - 6); return d.getTime(); }
+  if (r === "monthly") { d.setDate(d.getDate() - 29); return d.getTime(); }
+  d.setDate(d.getDate() - 364); return d.getTime();
+}
+function rangeDays(r: Range) {
+  return r === "daily" ? 1 : r === "weekly" ? 7 : r === "monthly" ? 30 : 365;
+}
+
 function sumWork(sessions: SessionLog[], from: number) {
-  return sessions
-    .filter((s) => s.mode === "work" && s.startedAt >= from)
-    .reduce((a, s) => a + s.durationSec, 0);
+  return sessions.filter((s) => s.mode === "work" && s.startedAt >= from).reduce((a, s) => a + s.durationSec, 0);
 }
 function countWork(sessions: SessionLog[], from: number) {
   return sessions.filter((s) => s.mode === "work" && s.startedAt >= from).length;
@@ -48,172 +61,222 @@ function dailyBuckets(sessions: SessionLog[], days: number) {
   return buckets;
 }
 
-function StatCard({
-  label, value, sub, icon: Icon, tint = "petal",
-}: {
-  label: string; value: string; sub?: string;
-  icon: typeof Heart; tint?: "petal" | "rose";
-}) {
-  return (
-    <div className="card-soft p-6 relative overflow-hidden group">
-      <div
-        className={
-          "absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-60 group-hover:scale-110 transition-transform " +
-          (tint === "rose" ? "bg-rose/20" : "bg-petal/40")
-        }
-      />
-      <div className="relative flex items-center justify-between">
-        <span className="chip"><Icon size={12} className="text-primary" /> {label}</span>
-      </div>
-      <div className="relative mt-4 font-display text-4xl tabular">{value}</div>
-      {sub && <div className="relative text-xs text-muted-foreground mt-1.5">{sub}</div>}
-    </div>
-  );
-}
-
 function Stats() {
   const sessions = useSessions();
-  const { settings } = useSettings();
+  const [range, setRange] = useState<Range>("monthly");
+  const [hover, setHover] = useState<{ d: Date; sec: number } | null>(null);
 
-  const now = new Date();
-  const today = startOfDay(now).getTime();
-  const weekStart = startOfDay(new Date(now.getTime() - 6 * 86400000)).getTime();
-  const monthStart = startOfDay(new Date(now.getTime() - 29 * 86400000)).getTime();
+  const from = rangeStart(range);
+  const totalSec = sumWork(sessions, from);
+  const sessionsCount = countWork(sessions, from);
+  const days = rangeDays(range);
+  const avg = Math.round(totalSec / Math.max(1, days));
 
   const trend = useMemo(() => dailyBuckets(sessions, 30), [sessions]);
   const maxSec = Math.max(1, ...trend.map((b) => b.seconds));
 
-  const dailyGoalSec = settings.workMinutes * 60 * 4;
-  const weeklyGoalSec = dailyGoalSec * 5;
-  const todaySec = sumWork(sessions, today);
-  const weekSec = sumWork(sessions, weekStart);
-  const dailyPct = Math.min(100, Math.round((todaySec / dailyGoalSec) * 100));
-  const weeklyPct = Math.min(100, Math.round((weekSec / weeklyGoalSec) * 100));
+  // Streak
+  const workDays = new Set(
+    sessions.filter((s) => s.mode === "work").map((s) => startOfDay(new Date(s.startedAt)).getTime())
+  );
+  let cur = 0;
+  const cursor = startOfDay(new Date());
+  if (!workDays.has(cursor.getTime())) cursor.setDate(cursor.getDate() - 1);
+  while (workDays.has(cursor.getTime())) { cur += 1; cursor.setDate(cursor.getDate() - 1); }
+  // Longest
+  const sortedDays = [...workDays].sort((a, b) => a - b);
+  let longest = 0, run = 0, prev = 0;
+  for (const t of sortedDays) {
+    if (prev && t - prev === 86400000) run += 1; else run = 1;
+    longest = Math.max(longest, run); prev = t;
+  }
+
+  const monthLabel = new Date().toLocaleDateString(undefined, { month: "long", year: "numeric" });
 
   return (
     <Shell>
-      <section className="mx-auto max-w-5xl px-6 py-10 md:py-14">
-        <header className="mb-10 text-center md:text-left">
-          <p className="font-script text-2xl text-rose">your cozy stats ♡</p>
-          <h1 className="font-display text-5xl md:text-6xl tracking-tight mt-1">
-            Look how far you&apos;ve come
+      <div className="card-blush p-5 md:p-6 flex items-center gap-4 relative overflow-hidden">
+        <div className="flex-1">
+          <h1 className="font-display text-2xl md:text-3xl tracking-tight inline-flex items-center gap-2">
+            Statistics <Heart size={18} className="text-rose" />
           </h1>
-          <p className="mt-3 text-sm text-muted-foreground max-w-lg md:mx-0 mx-auto">
-            Every bloom in your garden is a session you showed up for. So proud of you.
-          </p>
-        </header>
-
-        {/* Top stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <StatCard
-            label="Today" icon={Star}
-            value={formatDuration(sumWork(sessions, today))}
-            sub={`${countWork(sessions, today)} sweet sessions`}
-          />
-          <StatCard
-            label="This week" icon={Heart} tint="rose"
-            value={formatDuration(sumWork(sessions, weekStart))}
-            sub={`${countWork(sessions, weekStart)} sessions in 7 days`}
-          />
-          <StatCard
-            label="This month" icon={Flower}
-            value={formatDuration(sumWork(sessions, monthStart))}
-            sub={`${countWork(sessions, monthStart)} sessions in 30 days`}
-          />
+          <p className="text-sm text-muted-foreground mt-0.5">Look how far you&apos;ve come ♡</p>
         </div>
+        <button className="h-11 w-11 rounded-2xl bg-card border border-border grid place-items-center text-rose">
+          <Calendar size={18} />
+        </button>
+      </div>
 
-        {/* Goals */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-          <div className="card-soft p-6 relative overflow-hidden">
-            <Coffee className="absolute -bottom-3 -right-3 text-petal/60" size={64} />
-            <div className="flex items-center justify-between">
-              <span className="chip"><Sparkle size={12} className="text-rose" /> Daily goal</span>
-              <span className="font-script text-rose text-xl">{dailyPct}%</span>
-            </div>
-            <div className="mt-4">
-              <div className="h-3 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-petal to-rose transition-all duration-700"
-                  style={{ width: `${dailyPct}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                {formatDuration(todaySec)} of {formatDuration(dailyGoalSec)} today
-              </p>
-            </div>
-          </div>
+      {/* Range tabs */}
+      <div className="mt-5 grid grid-cols-4 gap-2 p-1.5 rounded-full card-soft">
+        {(["daily", "weekly", "monthly", "yearly"] as Range[]).map((r) => {
+          const active = range === r;
+          return (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={
+                "py-2 text-sm font-medium rounded-full transition-all capitalize " +
+                (active
+                  ? "bg-gradient-to-r from-rose to-rose/80 text-primary-foreground shadow-[var(--shadow-soft)]"
+                  : "text-muted-foreground hover:text-foreground")
+              }
+            >
+              {r}
+            </button>
+          );
+        })}
+      </div>
 
-          <div className="card-soft p-6 relative overflow-hidden">
-            <Book className="absolute -bottom-3 -right-3 text-rose/30" size={64} />
-            <div className="flex items-center justify-between">
-              <span className="chip"><Heart size={12} className="text-rose" /> Weekly goal</span>
-              <span className="font-script text-rose text-xl">{weeklyPct}%</span>
-            </div>
-            <div className="mt-4">
-              <div className="h-3 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-rose to-primary transition-all duration-700"
-                  style={{ width: `${weeklyPct}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                {formatDuration(weekSec)} of {formatDuration(weeklyGoalSec)} this week
-              </p>
-            </div>
-          </div>
+      {/* Top stats */}
+      <section className="mt-5 card-soft p-5 md:p-6">
+        <div className="flex items-end justify-between mb-4">
+          <h2 className="font-display text-2xl tracking-tight inline-flex items-center gap-2">
+            {range === "yearly" ? "This Year" : monthLabel}
+            <Sparkle size={14} className="text-rose" />
+          </h2>
+          <span className="chip"><Calendar size={11} /> This {range.replace("ly", "")}</span>
         </div>
-
-        {/* Trend chart */}
-        <div className="mt-8 card-soft p-7 relative overflow-hidden">
-          <Sparkle className="absolute top-5 right-5 text-rose/60 animate-twinkle" size={16} />
-          <div className="flex items-end justify-between mb-8 flex-wrap gap-2">
-            <div>
-              <h2 className="font-display text-3xl tracking-tight">Last 30 days</h2>
-              <p className="text-sm text-muted-foreground mt-1">a soft little rhythm of focus</p>
-            </div>
-            <span className="chip">trend ✿</span>
-          </div>
-          <div className="flex items-end gap-1.5 h-48">
-            {trend.map((b, i) => {
-              const h = (b.seconds / maxSec) * 100;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                  <div className="relative flex-1 w-full flex items-end">
-                    <div
-                      className="w-full rounded-t-full bg-gradient-to-t from-petal to-rose group-hover:from-rose group-hover:to-primary transition-all duration-300"
-                      style={{ height: `${Math.max(b.seconds > 0 ? 4 : 0, h)}%` }}
-                      title={`${b.date.toLocaleDateString()} · ${formatDuration(b.seconds)}`}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-3 flex justify-between text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            <span>{trend[0]?.date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
-            <span>today ♡</span>
-          </div>
-        </div>
-
-        {/* Heatmap */}
-        <div className="mt-8">
-          <Heatmap />
-        </div>
-
-        {/* Bottom summary */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-5">
-          <StatCard label="All time"    icon={Star}   value={formatDuration(sumWork(sessions, 0))} />
-          <StatCard label="Total sessions" icon={Heart} tint="rose"
-                    value={countWork(sessions, 0).toString()} />
-          <StatCard label="Best day"    icon={Flower}
-                    value={formatDuration(Math.max(0, ...trend.map((b) => b.seconds)))} />
-          <StatCard label="Avg / day"   icon={Coffee} tint="rose"
-                    value={formatDuration(
-                      Math.round(trend.reduce((a, b) => a + b.seconds, 0) /
-                        Math.max(1, trend.filter((b) => b.seconds > 0).length || 1))
-                    )} />
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
+          <StatBox label="Total Time" value={formatDuration(totalSec) || "0m"}
+                   icon={<Coffee size={13} />} tint="petal" />
+          <StatBox label="Sessions" value={sessionsCount.toString()}
+                   icon={<Book size={13} />} tint="rose" />
+          <StatBox label="Daily Avg" value={formatDuration(avg) || "0m"}
+                   icon={<Heart size={13} />} tint="blush" />
         </div>
       </section>
+
+      {/* Heatmap */}
+      <section className="mt-5">
+        <Heatmap />
+      </section>
+
+      {/* Streaks */}
+      <section className="mt-5 card-soft p-5 md:p-6 grid grid-cols-2 gap-4 md:gap-6 relative overflow-hidden">
+        <img src={mascot} alt="Bear mascot"
+             width={512} height={512} loading="lazy"
+             className="hidden md:block absolute -left-2 bottom-0 w-24 animate-bob" />
+        <div className="md:pl-24">
+          <p className="text-xs uppercase tracking-[0.18em] text-rose font-semibold flex items-center gap-1.5">
+            <Heart size={11} /> Current Streak
+          </p>
+          <p className="font-display text-4xl md:text-5xl tabular mt-2">
+            {cur} <span className="text-xl text-muted-foreground font-sans">days</span>
+          </p>
+        </div>
+        <div className="border-l border-border/60 pl-4 md:pl-6">
+          <p className="text-xs uppercase tracking-[0.18em] text-rose font-semibold flex items-center gap-1.5">
+            <Star size={11} /> Longest Streak
+          </p>
+          <p className="font-display text-4xl md:text-5xl tabular mt-2">
+            {longest} <span className="text-xl text-muted-foreground font-sans">days</span>
+          </p>
+        </div>
+        <Bow size={28} className="absolute top-4 right-4 text-rose/50" />
+      </section>
+
+      {/* 30-day trend */}
+      <section className="mt-5 card-soft p-5 md:p-6 relative overflow-hidden">
+        <div className="flex items-end justify-between mb-2 flex-wrap gap-2">
+          <h2 className="font-display text-2xl tracking-tight">30-Day Trend</h2>
+          <span className="chip">Study Time</span>
+        </div>
+        <p className="text-xs text-muted-foreground mb-5 font-script text-base">
+          a soft little rhythm of focus ✿
+        </p>
+
+        <div className="relative h-56">
+          <svg viewBox={`0 0 ${trend.length * 20} 100`} preserveAspectRatio="none"
+               className="w-full h-full">
+            <defs>
+              <linearGradient id="line-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--rose)" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="var(--rose)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {/* gridlines */}
+            {[0, 25, 50, 75].map((y) => (
+              <line key={y} x1="0" y1={y} x2={trend.length * 20} y2={y}
+                    stroke="color-mix(in oklab, var(--petal) 40%, transparent)"
+                    strokeWidth="0.4" strokeDasharray="1 3" />
+            ))}
+            {/* area */}
+            <path
+              d={`M 0 100 ${trend.map((b, i) => `L ${i * 20 + 10} ${100 - (b.seconds / maxSec) * 90}`).join(" ")} L ${(trend.length - 1) * 20 + 10} 100 Z`}
+              fill="url(#line-grad)"
+            />
+            {/* line */}
+            <path
+              d={trend.map((b, i) => `${i === 0 ? "M" : "L"} ${i * 20 + 10} ${100 - (b.seconds / maxSec) * 90}`).join(" ")}
+              fill="none" stroke="var(--rose)" strokeWidth="1.2" strokeLinejoin="round" strokeLinecap="round"
+            />
+            {/* points */}
+            {trend.map((b, i) => (
+              <circle key={i} cx={i * 20 + 10} cy={100 - (b.seconds / maxSec) * 90} r="1.6"
+                      fill="var(--color-card)" stroke="var(--rose)" strokeWidth="1"
+                      onMouseEnter={() => setHover({ d: b.date, sec: b.seconds })}
+                      onMouseLeave={() => setHover(null)}
+                      style={{ cursor: "pointer" }} />
+            ))}
+          </svg>
+          {hover && (
+            <div className="absolute top-2 right-2 bg-rose text-primary-foreground rounded-xl px-3 py-1.5 text-xs shadow-[var(--shadow-soft)]">
+              <div className="font-display text-base tabular">{formatDuration(hover.sec) || "0m"}</div>
+              <div className="opacity-90 text-[10px]">
+                {hover.d.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="mt-3 flex justify-between text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          <span>{trend[0]?.date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+          <span>{trend[Math.floor(trend.length / 2)]?.date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+          <span>today ♡</span>
+        </div>
+      </section>
+
+      {/* Motivational footer */}
+      <section className="mt-5 card-blush p-5 md:p-7 flex items-center gap-4 md:gap-6 relative overflow-hidden">
+        <img src={studyDesk} alt="Cozy study scene"
+             width={640} height={640} loading="lazy"
+             className="w-24 md:w-32 flex-shrink-0 animate-bob" />
+        <div className="flex-1">
+          <p className="font-script text-2xl text-rose">Little by little,</p>
+          <p className="font-display text-2xl md:text-3xl tracking-tight">a little becomes a lot.</p>
+          <SparkleCluster className="mt-2" />
+        </div>
+      </section>
+
+      {/* All time summary */}
+      <section className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <StatBox label="All Time" value={formatDuration(sumWork(sessions, 0)) || "0m"}
+                 icon={<Star size={12} />} tint="petal" />
+        <StatBox label="Total Sessions" value={countWork(sessions, 0).toString()}
+                 icon={<Heart size={12} />} tint="rose" />
+        <StatBox label="Best Day" value={formatDuration(Math.max(0, ...trend.map((b) => b.seconds))) || "0m"}
+                 icon={<Flower size={12} />} tint="blush" />
+        <StatBox label="Avg / Day" value={formatDuration(
+          Math.round(trend.reduce((a, b) => a + b.seconds, 0) /
+            Math.max(1, trend.filter((b) => b.seconds > 0).length || 1))
+        ) || "0m"} icon={<Coffee size={12} />} tint="petal" />
+      </section>
     </Shell>
+  );
+}
+
+function StatBox({
+  label, value, icon, tint,
+}: { label: string; value: string; icon: React.ReactNode; tint: "petal" | "rose" | "blush" }) {
+  const bg = tint === "petal" ? "from-petal/40 to-petal/10"
+           : tint === "rose"  ? "from-rose/20 to-rose/5"
+           : "from-blush to-blush/40";
+  return (
+    <div className={`rounded-2xl border border-petal/40 p-4 bg-gradient-to-br ${bg}`}>
+      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-rose font-semibold">
+        {icon} {label}
+      </span>
+      <p className="font-display text-2xl md:text-3xl tabular mt-2">{value}</p>
+    </div>
   );
 }
