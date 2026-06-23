@@ -86,6 +86,10 @@ Timely is fully functional, tested, and actively used as a personal productivity
 ## Screenshots
 
 <img width="1918" height="868" alt="Screenshot 2026-06-23 102001" src="https://github.com/user-attachments/assets/ae5bb6a9-3bf3-4cf7-892e-741b17571eb5" />
+<img width="1901" height="856" alt="Screenshot 2026-06-23 102110" src="https://github.com/user-attachments/assets/6043f825-cc72-40e5-9dc4-bf9d3a788ebf" />
+<img width="1918" height="862" alt="Screenshot 2026-06-23 102017" src="https://github.com/user-attachments/assets/c2b30a0c-f733-4c1a-a6b1-53b1346b58d0" />
+
+
 
 
 ## Live Demo
