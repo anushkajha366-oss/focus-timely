@@ -4,38 +4,78 @@ A cozy, productivity-focused study companion that helps students build consisten
 
 ## Features
 
-* 🍅 **Customizable Pomodoro Timer** — Adjust work and break intervals to match your study style
-* 🔥 **Study Streak Tracking** — Stay motivated with visual streak tracking and consistency insights
-* 📊 **Daily & Weekly Analytics** — Monitor study sessions and identify productivity patterns
-* 📈 **Monthly Focus Heatmap** — Visualize long-term study consistency and peak focus periods
-* 🔔 **Browser Notifications** — Receive session reminders and timer updates
-* 💾 **Persistent Progress** — Data is stored locally to preserve study history and streaks
-* 📱 **Responsive Design** — Optimized for both desktop and mobile devices
+🍅 **Customizable Pomodoro Timer**
+- Adjustable focus and break intervals
+- Helps users follow structured study sessions
+
+🔥 **Study Streak Tracking**
+- Tracks consistency
+- Encourages daily study habits
+
+📊 **Productivity Analytics**
+- Daily study insights
+- Weekly progress tracking
+- Monthly productivity overview
+
+📈 **Focus Heatmap**
+- Visualizes study consistency and focus patterns
+
+🔔 **Browser Notifications**
+- Session completion alerts
+- Timer reminders
+
+💾 **Local Storage Persistence**
+- Saves user preferences and study history locally
+- No account required
+
+📱 **Responsive Design**
+- Optimized for desktop, tablet, and mobile
+
+---
 
 ## Why I Built This
 
 Most study apps focus heavily on functionality but often overlook the user experience. I wanted to create a study companion that was both effective and enjoyable to use. Timely combines proven productivity techniques such as Pomodoro sessions, streak tracking, and progress visualization with a cozy pastel aesthetic that encourages students to build sustainable study habits.
 
-## Tech Stack
+# Tech Stack
 
-* React 19
-* TypeScript
-* Vite
-* Tailwind CSS
-* TanStack Router
-* TanStack Query
-* Recharts
-* Radix UI
-* Browser Notifications API
-* Local Storage
+### Frontend
+- React 19
+- TypeScript
+- Vite
+- TanStack Start
+- TanStack Router
+- TanStack Query
+
+### Styling & UI
+- Tailwind CSS
+- Radix UI
+
+### Data & APIs
+- Recharts
+- Browser Notifications API
+- Local Storage
+
+### Deployment
+- Vercel
 
 ## Project Highlights
+- Designed and developed a complete productivity web application
+- Implemented a Pomodoro timer with customizable sessions
+- Built analytics dashboards for productivity tracking
+- Created interactive data visualizations using Recharts
+- Implemented browser-based notifications
+- Developed responsive UI components
+- Tested the application through personal usage and iterative improvements
+- Deployed a production-ready application using Vercel
 
-* Designed and developed a complete productivity web application from concept to deployment
-* Implemented real-time focus tracking and study analytics dashboards
-* Built interactive data visualizations to help users understand productivity trends
-* Created a responsive and accessible user interface optimized for multiple devices
-* Iterated on the product design through personal testing and usability improvements
+## Deployment Challenge
+
+The application was initially working correctly in the development environment but failed during Vercel deployment.
+
+The issue was related to the TanStack Start + Nitro deployment configuration.
+
+The default configuration did not specify the Vercel deployment target.
 
 ## Status
 
@@ -45,15 +85,16 @@ Timely is fully functional, tested, and actively used as a personal productivity
 
 ## Screenshots
 
-Screenshots will be added after deployment.
+<img width="1918" height="868" alt="Screenshot 2026-06-23 102001" src="https://github.com/user-attachments/assets/ae5bb6a9-3bf3-4cf7-892e-741b17571eb5" />
+
 
 ## Live Demo
 
-Coming Soon
+[View Timely Live](https://timely-anushka-reece.vercel.app/)
 
 ## Source Code
 
-GitHub Repository
+https://github.com/anushkajha366-oss/focus-timely
 
 ## Author
 
