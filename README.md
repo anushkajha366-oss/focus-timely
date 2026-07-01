@@ -2,86 +2,74 @@
 
 A cozy, productivity-focused study companion that helps students build consistent study habits through structured focus sessions and intuitive progress tracking.
 
-## Features
+Most study apps nail the functionality but forget about the experience. I wanted something that actually felt good to open every day — so Timely pairs proven techniques like Pomodoro sessions, streak tracking, and progress visualization with a cozy pastel aesthetic, instead of yet another sterile productivity dashboard.
 
-🍅 **Customizable Pomodoro Timer**
-- Adjustable focus and break intervals
-- Helps users follow structured study sessions
-
-🔥 **Study Streak Tracking**
-- Tracks consistency
-- Encourages daily study habits
-
-📊 **Productivity Analytics**
-- Daily study insights
-- Weekly progress tracking
-- Monthly productivity overview
-
-📈 **Focus Heatmap**
-- Visualizes study consistency and focus patterns
-
-🔔 **Browser Notifications**
-- Session completion alerts
-- Timer reminders
-
-💾 **Local Storage Persistence**
-- Saves user preferences and study history locally
-- No account required
-
-📱 **Responsive Design**
-- Optimized for desktop, tablet, and mobile
+**[Try it live →](https://timely-anushka-reece.vercel.app/)**
 
 ---
 
-## Why I Built This
+## Features
 
-Most study apps focus heavily on functionality but often overlook the user experience. I wanted to create a study companion that was both effective and enjoyable to use. Timely combines proven productivity techniques such as Pomodoro sessions, streak tracking, and progress visualization with a cozy pastel aesthetic that encourages students to build sustainable study habits.
+| Feature | What it does |
+|---|---|
+| 🍅 **Customizable Pomodoro Timer** | Set your own focus and break intervals and just follow the rhythm |
+| 🔥 **Study Streak Tracking** | Keeps a running streak of consistent days to nudge you into showing up daily |
+| 📊 **Productivity Analytics** | Daily insights, weekly progress, and a monthly overview of how you've actually been studying |
+| 📈 **Focus Heatmap** | A GitHub-style heatmap that visualizes your consistency and focus patterns at a glance |
+| 🔔 **Browser Notifications** | Get pinged when a session ends or a break's over, so you're not watching the clock |
+| 💾 **Local Storage Persistence** | Preferences and history save right in the browser — no account, no sign-up, no friction |
+| 📱 **Responsive Design** | Works just as well on your phone or tablet as it does on desktop |
 
-# Tech Stack
+---
 
-### Frontend
-- React 19
-- TypeScript
-- Vite
-- TanStack Start
-- TanStack Router
-- TanStack Query
+## Tech Stack
 
-### Styling & UI
-- Tailwind CSS
-- Radix UI
+| Layer | Tools |
+| **Frontend** | React 19, TypeScript, Vite |
+| **Routing & Data** | TanStack Start, TanStack Router, TanStack Query |
+| **Styling & UI** | Tailwind CSS, Radix UI |
+| **Data & APIs** | Recharts, Browser Notifications API, Local Storage |
+| **Deployment** | Vercel |
 
-### Data & APIs
-- Recharts
-- Browser Notifications API
-- Local Storage
-
-### Deployment
-- Vercel
+---
 
 ## Project Highlights
-- Designed and developed a complete productivity web application
-- Implemented a Pomodoro timer with customizable sessions
-- Built analytics dashboards for productivity tracking
-- Created interactive data visualizations using Recharts
-- Implemented browser-based notifications
-- Developed responsive UI components
-- Tested the application through personal usage and iterative improvements
-- Deployed a production-ready application using Vercel
 
-## Deployment Challenge
+- Designed and built a full productivity web app from scratch, not just a template
+- Pomodoro timer with fully customizable session lengths
+- Analytics dashboards built on real interactive charts (Recharts), not static numbers
+- Browser-based notifications wired up for session/break alerts
+- Fully responsive component set, tested across screen sizes
+- Iterated on through actual daily personal use, not just a demo run
+- Deployed and running in production on Vercel
 
-The application was initially working correctly in the development environment but failed during Vercel deployment.
+---
 
-The issue was related to the TanStack Start + Nitro deployment configuration.
+## A Deployment Hiccup Worth Mentioning
 
-The default configuration did not specify the Vercel deployment target.
+Everything ran fine locally, then broke the moment I deployed to Vercel. Turned out to be the TanStack Start + Nitro build config — it didn't have a Vercel target specified by default, so the build didn't know how to package itself for Vercel's runtime. Once that was set explicitly, deployment went through clean.
+
+---
 
 ## Status
 
-**Version 1.0 — Feature Complete**
 
-Timely is fully functional, tested, and actively used as a personal productivity application.
+| **Version** | 1.0 — Feature Complete |
+| **Usage** | Actively used daily, not a shelved side project |
+
+---
+
+## Links
+
+
+| **Live demo** | [timely-anushka-reece.vercel.app](https://timely-anushka-reece.vercel.app/) |
+| **Source code** | [github.com/anushkajha366-oss/focus-timely](https://github.com/anushkajha366-oss/focus-timely) |
+
+---
+
+## Author
+
+**Anushka Jha**
 
 ## Screenshots
 
@@ -100,6 +88,4 @@ Timely is fully functional, tested, and actively used as a personal productivity
 
 https://github.com/anushkajha366-oss/focus-timely
 
-## Author
 
-Anushka Jha
